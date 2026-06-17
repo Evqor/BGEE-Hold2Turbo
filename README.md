@@ -4,8 +4,8 @@
 
 It does not patch BGEE game files directly. Instead, it combines **AutoHotkey v2** and **Cheat Engine Speedhack**:
 
-- Hold `XButton1` while the BGEE window is active → switch to turbo speed.
-- Release `XButton1` → return to normal speed.
+- Hold `XButton1` while the BGEE window is active → enable turbo speed.
+- Release `XButton1` → Cheat Engine stops the turbo hotkey automatically.
 - The AutoHotkey script watches for the BGEE process and opens the included Cheat Engine table automatically.
 - The Cheat Engine table registers BGEE process names for auto-attach.
 
@@ -26,16 +26,17 @@ BGEE-Hold2Turbo/
 
 ## Setup
 
-### 1. Configure Cheat Engine Speedhack hotkeys
+### 1. Configure Cheat Engine Speedhack
 
-Open Cheat Engine and configure Speedhack hotkeys like this:
+Open Cheat Engine and configure one Speedhack hotkey like this:
 
 ```text
-Ctrl + Alt + Shift + 1 → Speedhack 2.0x
-Ctrl + Alt + Shift + 2 → Speedhack 1.0x
+Hotkey: F9
+Speed: 2.0x
+Stop on release: enabled
 ```
 
-The AutoHotkey script does not directly change the speed value itself. It sends these hotkeys to Cheat Engine when you press or release the mouse side button.
+The AutoHotkey script holds `F9` down while you hold the mouse side button, then releases `F9` when you release the button. Cheat Engine handles the return to normal speed through `Stop on release`.
 
 ### 2. Keep the files together
 
@@ -117,16 +118,23 @@ XButton2::
 XButton2 Up::
 ```
 
-## Change the turbo speed
+## Change the turbo key
 
-The default recommended setup is:
+The default virtual key sent to Cheat Engine is `F9`.
 
-```text
-Ctrl + Alt + Shift + 1 → turbo speed
-Ctrl + Alt + Shift + 2 → normal speed
+To use a different key, change this line in `BGEE-Hold2Turbo.ahk`:
+
+```ahk
+turboKey := "F9"
 ```
 
-To use `1.5x` instead of `2.0x`, change the Speedhack value assigned to `Ctrl + Alt + Shift + 1` inside Cheat Engine.
+Then configure the same key as the Speedhack hotkey in Cheat Engine with `Stop on release` enabled.
+
+## Change the turbo speed
+
+The recommended setup is `2.0x`.
+
+To use `1.5x` or another value, change the Speedhack value assigned to the hotkey inside Cheat Engine.
 
 ## Notes
 

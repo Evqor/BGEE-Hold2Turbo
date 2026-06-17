@@ -8,9 +8,8 @@
 -- in Cheat Engine's auto-attach list, then tries immediate attach if the game
 -- is already running.
 --
--- Speedhack hotkeys are configured once in Cheat Engine itself:
---   Ctrl + Alt + Shift + 1 => Speedhack 2.0x
---   Ctrl + Alt + Shift + 2 => Speedhack 1.0x
+-- Configure the Speedhack hotkey once in Cheat Engine:
+--   F9 => Speedhack 2.0x with "Stop on release" enabled
 
 if syntaxcheck then return end
 

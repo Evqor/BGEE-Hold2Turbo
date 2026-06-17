@@ -4,11 +4,10 @@
 
 ; BGEE-Hold2Turbo
 ; Hold a mouse side button while Baldur's Gate: Enhanced Edition is active
-; to temporarily switch Cheat Engine Speedhack to turbo speed.
+; to temporarily enable Cheat Engine Speedhack turbo speed.
 ;
 ; Required one-time Cheat Engine hotkey setup:
-;   Ctrl + Alt + Shift + 1 => Speedhack 2.0x
-;   Ctrl + Alt + Shift + 2 => Speedhack 1.0x
+;   F9 => Speedhack 2.0x with "Stop on release" enabled
 ;
 ; Place BGEE-Hold2Turbo.ct in the same folder as this script.
 
@@ -28,10 +27,12 @@ ctPath := A_ScriptDir "\BGEE-Hold2Turbo.ct"
 ; ceExe := "C:\Program Files\Cheat Engine 7.5\cheatengine-x86_64.exe"
 ceExe := ""
 
-; Default side mouse button: XButton1.
-; Change every XButton1 / XButton1 Up hotkey near the bottom if you want XButton2.
-turboOnHotkey := "^!+1"   ; Ctrl + Alt + Shift + 1
-turboOffHotkey := "^!+2"  ; Ctrl + Alt + Shift + 2
+; Cheat Engine Speedhack hotkey.
+; Configure this key in Cheat Engine as:
+;   Speed: 2.0
+;   Stop on release: enabled
+; F9 is recommended because it avoids modifier-key state issues.
+turboKey := "F9"
 
 watchIntervalMs := 1000
 showTrayTips := true
@@ -54,18 +55,17 @@ if resolvedCeExe = "" {
 }
 
 SetTimer WatchBGEE, watchIntervalMs
-OnExit ResetSpeedOnExit
+OnExit ResetTurboKeyOnExit
 
 WatchBGEE() {
     global gameExeCandidates, ctPath, resolvedCeExe
-    global ctLaunchedForCurrentRun, lastGamePid, turboHeld, turboOffHotkey, showTrayTips
+    global ctLaunchedForCurrentRun, lastGamePid, turboHeld, turboKey, showTrayTips
 
     pid := FindProcess(gameExeCandidates)
 
     if pid {
         if turboHeld && !IsBGEEActive() {
-            Send turboOffHotkey
-            turboHeld := false
+            ReleaseTurboKey()
         }
 
         if pid != lastGamePid {
@@ -82,8 +82,7 @@ WatchBGEE() {
         }
     } else {
         if turboHeld {
-            Send turboOffHotkey
-            turboHeld := false
+            ReleaseTurboKey()
         }
         lastGamePid := 0
         ctLaunchedForCurrentRun := false
@@ -135,31 +134,36 @@ ResolveCheatEnginePath(manualPath) {
     return ""
 }
 
-ResetSpeedOnExit(*) {
-    global turboHeld, turboOffHotkey
-    if turboHeld {
-        Send turboOffHotkey
+PressTurboKey() {
+    global turboHeld, turboKey
+    if !turboHeld {
+        turboHeld := true
+        Send "{" turboKey " down}"
     }
+}
+
+ReleaseTurboKey() {
+    global turboHeld, turboKey
+    if turboHeld {
+        turboHeld := false
+        Send "{" turboKey " up}"
+    }
+}
+
+ResetTurboKeyOnExit(*) {
+    ReleaseTurboKey()
 }
 
 #HotIf IsBGEEActive()
 
 XButton1::
 {
-    global turboHeld, turboOnHotkey
-    if !turboHeld {
-        turboHeld := true
-        Send turboOnHotkey
-    }
+    PressTurboKey()
 }
 
 XButton1 Up::
 {
-    global turboHeld, turboOffHotkey
-    if turboHeld {
-        turboHeld := false
-        Send turboOffHotkey
-    }
+    ReleaseTurboKey()
 }
 
 #HotIf
