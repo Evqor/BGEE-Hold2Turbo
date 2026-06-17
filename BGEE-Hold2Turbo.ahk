@@ -1,13 +1,12 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
-#UseHook true
 
 ; BGEE-Hold2Turbo
-; Hold a mouse side button while Baldur's Gate: Enhanced Edition is active
-; to temporarily enable Cheat Engine Speedhack turbo speed.
+; Watches for Baldur's Gate: Enhanced Edition and opens the included
+; Cheat Engine table after a short startup delay.
 ;
-; Required one-time Cheat Engine hotkey setup:
-;   F9 => Speedhack 2.0x with "Stop on release" enabled
+; This script does not remap input keys or control Speedhack directly.
+; Configure the hold key and turbo speed inside Cheat Engine's hotkey settings.
 ;
 ; Place BGEE-Hold2Turbo.ct in the same folder as this script.
 
@@ -38,13 +37,6 @@ openTableDelayMs := 12000
 ; Only open the CT after a BGEE window exists, not immediately after the process appears.
 requireGameWindowBeforeOpen := true
 
-; Cheat Engine Speedhack hotkey.
-; Configure this key in Cheat Engine as:
-;   Speed: 2.0
-;   Stop on release: enabled
-; F9 is recommended because it avoids modifier-key state issues.
-turboKey := "F9"
-
 watchIntervalMs := 1000
 showTrayTips := true
 
@@ -52,7 +44,6 @@ showTrayTips := true
 ; Internal state
 ; =========================
 
-turboHeld := false
 ctLaunchedForCurrentRun := false
 lastGamePid := 0
 gameDetectedTick := 0
@@ -67,20 +58,15 @@ if resolvedCeExe = "" {
 }
 
 SetTimer WatchBGEE, watchIntervalMs
-OnExit ResetTurboKeyOnExit
 
 WatchBGEE() {
     global gameExeCandidates, ctPath, resolvedCeExe
     global autoOpenCheatTable, openTableDelayMs, requireGameWindowBeforeOpen
-    global ctLaunchedForCurrentRun, lastGamePid, gameDetectedTick, turboHeld, showTrayTips
+    global ctLaunchedForCurrentRun, lastGamePid, gameDetectedTick, showTrayTips
 
     pid := FindProcess(gameExeCandidates)
 
     if pid {
-        if turboHeld && !IsBGEEActive() {
-            ReleaseTurboKey()
-        }
-
         if pid != lastGamePid {
             lastGamePid := pid
             gameDetectedTick := A_TickCount
@@ -95,9 +81,6 @@ WatchBGEE() {
             }
         }
     } else {
-        if turboHeld {
-            ReleaseTurboKey()
-        }
         lastGamePid := 0
         gameDetectedTick := 0
         ctLaunchedForCurrentRun := false
@@ -138,16 +121,6 @@ FindProcess(exeNames) {
     return 0
 }
 
-IsBGEEActive() {
-    global gameExeCandidates
-    for exeName in gameExeCandidates {
-        if WinActive("ahk_exe " exeName) {
-            return true
-        }
-    }
-    return false
-}
-
 IsBGEEWindowAvailable() {
     global gameExeCandidates
     for exeName in gameExeCandidates {
@@ -182,37 +155,3 @@ ResolveCheatEnginePath(manualPath) {
 
     return ""
 }
-
-PressTurboKey() {
-    global turboHeld, turboKey
-    if !turboHeld {
-        turboHeld := true
-        Send "{" turboKey " down}"
-    }
-}
-
-ReleaseTurboKey() {
-    global turboHeld, turboKey
-    if turboHeld {
-        turboHeld := false
-        Send "{" turboKey " up}"
-    }
-}
-
-ResetTurboKeyOnExit(*) {
-    ReleaseTurboKey()
-}
-
-#HotIf IsBGEEActive()
-
-XButton1::
-{
-    PressTurboKey()
-}
-
-XButton1 Up::
-{
-    ReleaseTurboKey()
-}
-
-#HotIf

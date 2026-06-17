@@ -1,13 +1,14 @@
 # BGEE-Hold2Turbo
 
-**BGEE-Hold2Turbo** is a small utility for *Baldur's Gate: Enhanced Edition* that lets you temporarily speed up the game while holding a mouse side button.
+**BGEE-Hold2Turbo** is a small helper utility for *Baldur's Gate: Enhanced Edition* that makes it easier to use Cheat Engine Speedhack as a temporary hold-to-turbo button.
 
-It does not patch BGEE game files directly. Instead, it combines **AutoHotkey v2** and **Cheat Engine Speedhack**:
+It does not patch BGEE game files directly. Instead, it combines **AutoHotkey v2** and **Cheat Engine**:
 
-- Hold `XButton1` while the BGEE window is active → enable turbo speed.
-- Release `XButton1` → Cheat Engine stops the turbo hotkey automatically.
-- The AutoHotkey script watches for the BGEE process and opens the included Cheat Engine table after a short startup delay.
+- AutoHotkey detects the BGEE process and opens the included Cheat Engine table after a short startup delay.
 - The Cheat Engine table registers BGEE process names for auto-attach.
+- Cheat Engine handles the actual Speedhack hotkey, hold key, speed value, and `Stop on release` behavior.
+
+AutoHotkey is only used to detect `Baldur.exe` / `Baldur64.exe` and load the Cheat Engine table. If you want to change the key or turbo speed, use Cheat Engine's hotkey settings.
 
 ## Requirements
 
@@ -28,15 +29,19 @@ BGEE-Hold2Turbo/
 
 ### 1. Configure Cheat Engine Speedhack
 
-Open Cheat Engine and configure one Speedhack hotkey like this:
+Open Cheat Engine and configure a Speedhack hotkey.
+
+Recommended setup:
 
 ```text
-Hotkey: F9
+Hotkey: your preferred hold key, such as XButton1 or F9
 Speed: 2.0x
 Stop on release: enabled
 ```
 
-The AutoHotkey script holds `F9` down while you hold the mouse side button, then releases `F9` when you release the button. Cheat Engine handles the return to normal speed through `Stop on release`.
+With `Stop on release` enabled, Cheat Engine applies turbo speed only while the hotkey is being held. When the key is released, Cheat Engine stops the temporary speed change.
+
+The AutoHotkey script does not translate mouse buttons or keyboard keys. It only opens the Cheat Engine table automatically. Key binding and speed changes should be handled inside Cheat Engine.
 
 If Cheat Engine shows a prompt saying that the table contains Lua code and asks when to run it, choose **Always** and click **OK**. This allows the table's auto-attach script to run automatically, and the prompt should not appear again for this table.
 
@@ -87,8 +92,7 @@ AHK starts
 → AHK waits briefly to avoid BGEE's startup phase
 → BGEE-Hold2Turbo.ct opens through Cheat Engine
 → The CT Lua script registers Baldur.exe / Baldur64.exe for auto-attach
-→ Hold XButton1 while the BGEE window is active: turbo speed
-→ Release XButton1: normal speed
+→ You use the Speedhack hold key configured in Cheat Engine
 ```
 
 ## Start with Windows
@@ -104,41 +108,37 @@ shell:startup
 
 3. Place a shortcut to `BGEE-Hold2Turbo.ahk` in that folder.
 
-## Change the mouse button
+## Change the hold key
 
-The default button is `XButton1`.
+Change the Speedhack hotkey inside Cheat Engine.
 
-To use `XButton2`, edit the two hotkey labels near the bottom of `BGEE-Hold2Turbo.ahk`:
+For example, you can set the hotkey to:
 
-```ahk
-XButton1::
-XButton1 Up::
+```text
+XButton1
 ```
 
-Change them to:
+or:
 
-```ahk
-XButton2::
-XButton2 Up::
+```text
+F9
 ```
 
-## Change the turbo key
-
-The default virtual key sent to Cheat Engine is `F9`.
-
-To use a different key, change this line in `BGEE-Hold2Turbo.ahk`:
-
-```ahk
-turboKey := "F9"
-```
-
-Then configure the same key as the Speedhack hotkey in Cheat Engine with `Stop on release` enabled.
+Keep `Stop on release` enabled if you want turbo speed only while holding the key.
 
 ## Change the turbo speed
 
-The recommended setup is `2.0x`.
+Change the Speedhack value assigned to the hotkey inside Cheat Engine.
 
-To use `1.5x` or another value, change the Speedhack value assigned to the hotkey inside Cheat Engine.
+Examples:
+
+```text
+1.5x
+2.0x
+3.0x
+```
+
+`2.0x` is a reasonable starting point. Higher values may make input timing or scripted events feel less stable.
 
 ## Stability options
 
@@ -161,6 +161,8 @@ Then open `BGEE-Hold2Turbo.ct` manually after BGEE reaches the main menu or afte
 ## Notes
 
 - This is an external automation utility, not a WeiDU mod.
+- AutoHotkey is used only for detecting BGEE and opening the Cheat Engine table.
+- Key binding, Speedhack speed, and `Stop on release` should be configured in Cheat Engine.
 - The table registers Cheat Engine auto-attach entries but does not directly call `openProcess()` during Lua startup.
 - Cheat Engine may ask for confirmation before running Lua from the table. Choose **Always** if you want the auto-attach setup to run without asking again.
 - If BGEE or Steam is running as administrator, AutoHotkey and Cheat Engine may need matching permissions.

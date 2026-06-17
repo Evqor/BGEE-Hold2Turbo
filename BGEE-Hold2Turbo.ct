@@ -10,8 +10,8 @@
 -- It intentionally does not call openProcess() directly. This keeps startup
 -- attachment less aggressive and avoids attaching during BGEE's launch phase.
 --
--- Configure the Speedhack hotkey once in Cheat Engine:
---   F9 => Speedhack 2.0x with "Stop on release" enabled
+-- Configure the hold key and Speedhack value directly in Cheat Engine.
+-- Enable "Stop on release" so turbo speed only runs while the key is held.
 
 if syntaxcheck then return end
 
