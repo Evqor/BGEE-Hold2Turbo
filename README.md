@@ -1,6 +1,6 @@
 # BGEE-Hold2Turbo
 
-**BGEE-Hold2Turbo** is a small helper utility for *Baldur's Gate: Enhanced Edition* that detects when Baldur's Gate starts and automatically opens the included Cheat Engine table for easier Speedhack setup.
+**BGEE-Hold2Turbo** is a small helper utility for *Baldur's Gate: Enhanced Edition* that detects when Baldur's Gate starts, automatically opens the included Cheat Engine table, and closes the Cheat Engine process launched by the script when the game exits.
 
 It does not patch BGEE game files directly. Instead, it combines **AutoHotkey v2** and **Cheat Engine**:
 
@@ -75,7 +75,6 @@ cheatEngineExitNotify := true
 
 Set either value to `false` if you do not want that notification.
 
-Normal notifications use an information icon instead of the default error-looking icon.
 
 ### 5. Run the script
 
