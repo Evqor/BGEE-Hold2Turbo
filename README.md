@@ -4,7 +4,7 @@
 
 It does not patch BGEE game files directly. Instead, it combines **AutoHotkey v2** and **Cheat Engine**:
 
-- AutoHotkey detects `Baldur.exe` / `Baldur64.exe` and opens the included Cheat Engine table after a short startup delay.
+- AutoHotkey detects `Baldur.exe` / `Baldur64.exe` and opens the included Cheat Engine table when the game window is available.
 - The Cheat Engine table prepares auto-attach entries for BGEE.
 - Cheat Engine handles the actual Speedhack behavior.
 
@@ -64,17 +64,30 @@ Example:
 ceExe := "C:\Program Files\Cheat Engine 7.5\cheatengine-x86_64.exe"
 ```
 
-### 4. Optional notifications
+### 4. Optional settings
 
-The script has separate notification settings for table loading and Cheat Engine exit behavior.
+By default, BGEE-Hold2Turbo opens the Cheat Engine table as soon as the BGEE process and game window are detected.
+
+If an error occurs during automatic table loading, try enabling the startup delay:
+
+```ahk
+useOpenTableDelay := true
+openTableDelayMs := 3000
+```
+
+If you want an easy way to check whether the table was opened, enable the attach notification:
 
 ```ahk
 attachNotify := true
-cheatEngineExitNotify := true
 ```
 
-Set either value to `false` if you do not want that notification.
+Normal table-open and Cheat Engine-exit notifications are disabled by default:
 
+```ahk
+attachNotify := false
+exitNotify := false
+startupWarningNotify := true
+```
 
 ### 5. Run the script
 
@@ -84,7 +97,7 @@ Run:
 BGEE-Hold2Turbo.ahk
 ```
 
-Then start BGEE. The script waits until the BGEE process and game window exist, waits a short delay, and then opens the Cheat Engine table.
+Then start BGEE. The script waits until the BGEE process and game window exist, then opens the Cheat Engine table.
 
 Expected behavior:
 
@@ -92,7 +105,6 @@ Expected behavior:
 AHK starts
 → BGEE process is detected
 → BGEE window appears
-→ AHK waits briefly to avoid BGEE's startup phase
 → BGEE-Hold2Turbo.ct opens through Cheat Engine
 → Cheat Engine attaches to BGEE
 → You use the Speedhack hold key configured in Cheat Engine
@@ -112,19 +124,8 @@ shell:startup
 
 3. Place a shortcut to `BGEE-Hold2Turbo.ahk` in that folder.
 
-## Stability options
-
-If BGEE closes when the Cheat Engine table opens automatically, open `BGEE-Hold2Turbo.ahk` and increase the startup delay:
-
-```ahk
-openTableDelayMs := 12000
-```
-
-For example, try `20000` to wait 20 seconds before opening the table.
-
-If it still does not work, please open an issue with your BGEE executable name, Cheat Engine version, and AutoHotkey version.
-
 ## Notes
 
 - If BGEE or Steam is running as administrator, AutoHotkey and Cheat Engine may need matching permissions.
 - Higher Speedhack values may make input timing or scripted events feel less stable.
+- If it does not work even with startup delay enabled, please open an issue with your BGEE executable name, Cheat Engine version, and AutoHotkey version.

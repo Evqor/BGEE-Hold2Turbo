@@ -3,7 +3,7 @@
 
 ; BGEE-Hold2Turbo
 ; Watches for Baldur's Gate: Enhanced Edition and opens the included
-; Cheat Engine table after a short startup delay.
+; Cheat Engine table when the game window is available.
 ;
 ; This script does not remap input keys or control Speedhack directly.
 ; Configure the hold key and turbo speed inside Cheat Engine's hotkey settings.
@@ -29,9 +29,10 @@ ceExe := ""
 ; Controls automatic CT loading. Normally leave this enabled.
 autoOpenCheatTable := true
 
-; Wait before opening the CT after the BGEE process appears.
-; This avoids attaching while the game is still starting up.
-openTableDelayMs := 12000
+; Optional wait before opening the CT after the BGEE process appears.
+; Normally this can stay disabled because the script waits for the BGEE window first.
+useOpenTableDelay := false
+openTableDelayMs := 3000
 
 ; Only open the CT after a BGEE window exists, not immediately after the process appears.
 requireGameWindowBeforeOpen := true
@@ -40,11 +41,11 @@ watchIntervalMs := 1000
 
 ; Notifications.
 ; Set each option to false if you do not want that notification.
-attachNotify := true
-cheatEngineExitNotify := true
+attachNotify := false
+exitNotify := false
 startupWarningNotify := true
 
-; Use an information icon for normal notifications instead of the default/error-looking icon.
+; Notification icon options.
 normalNotifyOptions := "Iconi"
 warningNotifyOptions := "Icon!"
 
@@ -73,7 +74,7 @@ SetTimer WatchBGEE, watchIntervalMs
 
 WatchBGEE() {
     global gameExeCandidates, ctPath, resolvedCeExe
-    global autoOpenCheatTable, openTableDelayMs, requireGameWindowBeforeOpen
+    global autoOpenCheatTable, useOpenTableDelay, openTableDelayMs, requireGameWindowBeforeOpen
     global ctLaunchedForCurrentRun, lastGamePid, gameDetectedTick, launchedCePid
     global closeCheatEngineOnGameExit, attachNotify, normalNotifyOptions
 
@@ -91,7 +92,7 @@ WatchBGEE() {
             launchedCePid := newCePid
             ctLaunchedForCurrentRun := true
             if attachNotify {
-                ShowNotify("BGEE detected. Cheat Engine table opened after startup delay.", normalNotifyOptions)
+                ShowNotify("BGEE detected. Cheat Engine table opened.", normalNotifyOptions)
             }
         }
     } else {
@@ -105,12 +106,12 @@ WatchBGEE() {
 }
 
 CloseLaunchedCheatEngine() {
-    global launchedCePid, cheatEngineExitNotify, normalNotifyOptions
+    global launchedCePid, exitNotify, normalNotifyOptions
 
     if launchedCePid && ProcessExist(launchedCePid) {
         try {
             ProcessClose launchedCePid
-            if cheatEngineExitNotify {
+            if exitNotify {
                 ShowNotify("BGEE closed. Cheat Engine process closed.", normalNotifyOptions)
             }
         } catch {
@@ -123,7 +124,7 @@ CloseLaunchedCheatEngine() {
 
 ShouldOpenCheatTable() {
     global ctPath, resolvedCeExe
-    global autoOpenCheatTable, openTableDelayMs, requireGameWindowBeforeOpen
+    global autoOpenCheatTable, useOpenTableDelay, openTableDelayMs, requireGameWindowBeforeOpen
     global ctLaunchedForCurrentRun, gameDetectedTick
 
     if !autoOpenCheatTable {
@@ -138,7 +139,7 @@ ShouldOpenCheatTable() {
         return false
     }
 
-    if gameDetectedTick = 0 || A_TickCount - gameDetectedTick < openTableDelayMs {
+    if useOpenTableDelay && (gameDetectedTick = 0 || A_TickCount - gameDetectedTick < openTableDelayMs) {
         return false
     }
 
