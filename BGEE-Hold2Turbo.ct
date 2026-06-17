@@ -3,7 +3,7 @@
   <CheatEntries/>
   <UserdefinedSymbols/>
   <LuaScript><![CDATA[
--- BGEE-Hold2Turbo v1.0-1
+-- BGEE-Hold2Turbo
 -- This table auto-registers Baldur's Gate: Enhanced Edition process names
 -- in Cheat Engine's auto-attach list, then tries immediate attach if the game
 -- is already running.

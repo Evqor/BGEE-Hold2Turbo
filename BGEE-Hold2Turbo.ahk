@@ -2,7 +2,7 @@
 #SingleInstance Force
 #UseHook true
 
-; BGEE-Hold2Turbo v1.0-1
+; BGEE-Hold2Turbo
 ; Hold a mouse side button while Baldur's Gate: Enhanced Edition is active
 ; to temporarily switch Cheat Engine Speedhack to turbo speed.
 ;
