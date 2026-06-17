@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries/>
+  <UserdefinedSymbols/>
+  <LuaScript><![CDATA[
+-- BGEE-Hold2Turbo v1.0-1
+-- This table auto-registers Baldur's Gate: Enhanced Edition process names
+-- in Cheat Engine's auto-attach list, then tries immediate attach if the game
+-- is already running.
+--
+-- Speedhack hotkeys are configured once in Cheat Engine itself:
+--   Ctrl + Alt + Shift + 1 => Speedhack 2.0x
+--   Ctrl + Alt + Shift + 2 => Speedhack 1.0x
+
+if syntaxcheck then return end
+
+local processNames = {
+  "Baldur.exe",
+  "Baldur64.exe"
+}
+
+local function safeAddAutoAttach(processName)
+  local list = getAutoAttachList()
+
+  local ok, index = pcall(function()
+    return list.IndexOf(processName)
+  end)
+
+  if ok then
+    if index == nil or index < 0 then
+      list.add(processName)
+    end
+  else
+    -- Fallback for CE builds where IndexOf is not exposed as expected.
+    -- Adding the same process name more than once is harmless for this use case.
+    list.add(processName)
+  end
+end
+
+for _, processName in ipairs(processNames) do
+  safeAddAutoAttach(processName)
+end
+
+-- Try immediate attach in case the game is already running.
+for _, processName in ipairs(processNames) do
+  pcall(function()
+    openProcess(processName)
+  end)
+end
+  ]]></LuaScript>
+</CheatTable>

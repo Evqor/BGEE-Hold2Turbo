@@ -1,0 +1,15 @@
+# Project handover notes should stay local and not be pushed.
+handover-note.md
+
+# AutoHotkey / local build output
+*.exe
+*.bak
+*.tmp
+
+# Windows clutter
+Thumbs.db
+Desktop.ini
+
+# Editor clutter
+.vscode/
+.idea/
