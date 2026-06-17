@@ -37,7 +37,16 @@ openTableDelayMs := 12000
 requireGameWindowBeforeOpen := true
 
 watchIntervalMs := 1000
-showTrayTips := true
+
+; Notifications.
+; Set each option to false if you do not want that notification.
+attachNotify := true
+cheatEngineExitNotify := true
+startupWarningNotify := true
+
+; Use an information icon for normal notifications instead of the default/error-looking icon.
+normalNotifyOptions := "Iconi"
+warningNotifyOptions := "Icon!"
 
 ; Close the Cheat Engine process launched by this script when BGEE exits.
 closeCheatEngineOnGameExit := true
@@ -52,12 +61,12 @@ gameDetectedTick := 0
 launchedCePid := 0
 resolvedCeExe := ResolveCheatEnginePath(ceExe)
 
-if !FileExist(ctPath) {
-    TrayTip "CT file not found:`n" ctPath, "BGEE-Hold2Turbo", 5
+if !FileExist(ctPath) && startupWarningNotify {
+    ShowNotify("CT file not found:`n" ctPath, warningNotifyOptions)
 }
 
-if resolvedCeExe = "" {
-    TrayTip "Cheat Engine was not found. Edit ceExe in the AHK script.", "BGEE-Hold2Turbo", 7
+if resolvedCeExe = "" && startupWarningNotify {
+    ShowNotify("Cheat Engine was not found. Edit ceExe in the AHK script.", warningNotifyOptions)
 }
 
 SetTimer WatchBGEE, watchIntervalMs
@@ -65,8 +74,8 @@ SetTimer WatchBGEE, watchIntervalMs
 WatchBGEE() {
     global gameExeCandidates, ctPath, resolvedCeExe
     global autoOpenCheatTable, openTableDelayMs, requireGameWindowBeforeOpen
-    global ctLaunchedForCurrentRun, lastGamePid, gameDetectedTick, launchedCePid, showTrayTips
-    global closeCheatEngineOnGameExit
+    global ctLaunchedForCurrentRun, lastGamePid, gameDetectedTick, launchedCePid
+    global closeCheatEngineOnGameExit, attachNotify, normalNotifyOptions
 
     pid := FindProcess(gameExeCandidates)
 
@@ -81,8 +90,8 @@ WatchBGEE() {
             Run '"' resolvedCeExe '" "' ctPath '"', , "Min", &newCePid
             launchedCePid := newCePid
             ctLaunchedForCurrentRun := true
-            if showTrayTips {
-                TrayTip "BGEE detected. Cheat Engine table opened after startup delay.", "BGEE-Hold2Turbo", 3
+            if attachNotify {
+                ShowNotify("BGEE detected. Cheat Engine table opened after startup delay.", normalNotifyOptions)
             }
         }
     } else {
@@ -96,12 +105,16 @@ WatchBGEE() {
 }
 
 CloseLaunchedCheatEngine() {
-    global launchedCePid, showTrayTips
+    global launchedCePid, cheatEngineExitNotify, normalNotifyOptions
 
     if launchedCePid && ProcessExist(launchedCePid) {
-        ProcessClose launchedCePid
-        if showTrayTips {
-            TrayTip "BGEE closed. Cheat Engine process closed.", "BGEE-Hold2Turbo", 3
+        try {
+            ProcessClose launchedCePid
+            if cheatEngineExitNotify {
+                ShowNotify("BGEE closed. Cheat Engine process closed.", normalNotifyOptions)
+            }
+        } catch {
+            ; Ignore close errors, such as the process exiting between ProcessExist and ProcessClose.
         }
     }
 
@@ -175,4 +188,8 @@ ResolveCheatEnginePath(manualPath) {
     }
 
     return ""
+}
+
+ShowNotify(message, options := "Iconi") {
+    TrayTip message, "BGEE-Hold2Turbo", options
 }

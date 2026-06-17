@@ -64,7 +64,20 @@ Example:
 ceExe := "C:\Program Files\Cheat Engine 7.5\cheatengine-x86_64.exe"
 ```
 
-### 4. Run the script
+### 4. Optional notifications
+
+The script has separate notification settings for table loading and Cheat Engine exit behavior.
+
+```ahk
+attachNotify := true
+cheatEngineExitNotify := true
+```
+
+Set either value to `false` if you do not want that notification.
+
+Normal notifications use an information icon instead of the default error-looking icon.
+
+### 5. Run the script
 
 Run:
 
