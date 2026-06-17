@@ -38,6 +38,8 @@ Stop on release: enabled
 
 The AutoHotkey script holds `F9` down while you hold the mouse side button, then releases `F9` when you release the button. Cheat Engine handles the return to normal speed through `Stop on release`.
 
+If Cheat Engine shows a prompt saying that the table contains Lua code and asks when to run it, choose **Always** and click **OK**. This allows the table's auto-attach script to run automatically, and the prompt should not appear again for this table.
+
 ### 2. Keep the files together
 
 Place these two files in the same folder:
@@ -139,6 +141,6 @@ To use `1.5x` or another value, change the Speedhack value assigned to the hotke
 ## Notes
 
 - This is an external automation utility, not a WeiDU mod.
-- Cheat Engine may ask for confirmation before running Lua from the table.
+- Cheat Engine may ask for confirmation before running Lua from the table. Choose **Always** if you want the auto-attach setup to run without asking again.
 - If BGEE or Steam is running as administrator, AutoHotkey and Cheat Engine may need matching permissions.
 - Avoid using this in multiplayer or online environments.
