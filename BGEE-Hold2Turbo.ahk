@@ -27,6 +27,17 @@ ctPath := A_ScriptDir "\BGEE-Hold2Turbo.ct"
 ; ceExe := "C:\Program Files\Cheat Engine 7.5\cheatengine-x86_64.exe"
 ceExe := ""
 
+; If BGEE closes when the CT is opened automatically, set this to false.
+; You can then open BGEE-Hold2Turbo.ct manually after BGEE reaches the main menu.
+autoOpenCheatTable := true
+
+; Wait before opening the CT after the BGEE process appears.
+; This avoids attaching while the game is still starting up.
+openTableDelayMs := 12000
+
+; Only open the CT after a BGEE window exists, not immediately after the process appears.
+requireGameWindowBeforeOpen := true
+
 ; Cheat Engine Speedhack hotkey.
 ; Configure this key in Cheat Engine as:
 ;   Speed: 2.0
@@ -44,6 +55,7 @@ showTrayTips := true
 turboHeld := false
 ctLaunchedForCurrentRun := false
 lastGamePid := 0
+gameDetectedTick := 0
 resolvedCeExe := ResolveCheatEnginePath(ceExe)
 
 if !FileExist(ctPath) {
@@ -59,7 +71,8 @@ OnExit ResetTurboKeyOnExit
 
 WatchBGEE() {
     global gameExeCandidates, ctPath, resolvedCeExe
-    global ctLaunchedForCurrentRun, lastGamePid, turboHeld, turboKey, showTrayTips
+    global autoOpenCheatTable, openTableDelayMs, requireGameWindowBeforeOpen
+    global ctLaunchedForCurrentRun, lastGamePid, gameDetectedTick, turboHeld, showTrayTips
 
     pid := FindProcess(gameExeCandidates)
 
@@ -70,14 +83,15 @@ WatchBGEE() {
 
         if pid != lastGamePid {
             lastGamePid := pid
+            gameDetectedTick := A_TickCount
             ctLaunchedForCurrentRun := false
         }
 
-        if !ctLaunchedForCurrentRun && FileExist(ctPath) && resolvedCeExe != "" {
+        if ShouldOpenCheatTable() {
             Run '"' resolvedCeExe '" "' ctPath '"', , "Min"
             ctLaunchedForCurrentRun := true
             if showTrayTips {
-                TrayTip "BGEE detected. Cheat Engine table opened.", "BGEE-Hold2Turbo", 3
+                TrayTip "BGEE detected. Cheat Engine table opened after startup delay.", "BGEE-Hold2Turbo", 3
             }
         }
     } else {
@@ -85,8 +99,33 @@ WatchBGEE() {
             ReleaseTurboKey()
         }
         lastGamePid := 0
+        gameDetectedTick := 0
         ctLaunchedForCurrentRun := false
     }
+}
+
+ShouldOpenCheatTable() {
+    global ctPath, resolvedCeExe
+    global autoOpenCheatTable, openTableDelayMs, requireGameWindowBeforeOpen
+    global ctLaunchedForCurrentRun, gameDetectedTick
+
+    if !autoOpenCheatTable {
+        return false
+    }
+
+    if ctLaunchedForCurrentRun || !FileExist(ctPath) || resolvedCeExe = "" {
+        return false
+    }
+
+    if requireGameWindowBeforeOpen && !IsBGEEWindowAvailable() {
+        return false
+    }
+
+    if gameDetectedTick = 0 || A_TickCount - gameDetectedTick < openTableDelayMs {
+        return false
+    }
+
+    return true
 }
 
 FindProcess(exeNames) {
@@ -103,6 +142,16 @@ IsBGEEActive() {
     global gameExeCandidates
     for exeName in gameExeCandidates {
         if WinActive("ahk_exe " exeName) {
+            return true
+        }
+    }
+    return false
+}
+
+IsBGEEWindowAvailable() {
+    global gameExeCandidates
+    for exeName in gameExeCandidates {
+        if WinExist("ahk_exe " exeName) {
             return true
         }
     }

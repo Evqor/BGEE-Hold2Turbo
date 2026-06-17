@@ -6,7 +6,7 @@ It does not patch BGEE game files directly. Instead, it combines **AutoHotkey v2
 
 - Hold `XButton1` while the BGEE window is active → enable turbo speed.
 - Release `XButton1` → Cheat Engine stops the turbo hotkey automatically.
-- The AutoHotkey script watches for the BGEE process and opens the included Cheat Engine table automatically.
+- The AutoHotkey script watches for the BGEE process and opens the included Cheat Engine table after a short startup delay.
 - The Cheat Engine table registers BGEE process names for auto-attach.
 
 ## Requirements
@@ -76,13 +76,15 @@ Run:
 BGEE-Hold2Turbo.ahk
 ```
 
-Then start BGEE. The script will detect the game process and open the Cheat Engine table.
+Then start BGEE. The script waits until the BGEE process and game window exist, waits a short delay, and then opens the Cheat Engine table.
 
 Expected behavior:
 
 ```text
 AHK starts
 → BGEE process is detected
+→ BGEE window appears
+→ AHK waits briefly to avoid BGEE's startup phase
 → BGEE-Hold2Turbo.ct opens through Cheat Engine
 → The CT Lua script registers Baldur.exe / Baldur64.exe for auto-attach
 → Hold XButton1 while the BGEE window is active: turbo speed
@@ -138,9 +140,28 @@ The recommended setup is `2.0x`.
 
 To use `1.5x` or another value, change the Speedhack value assigned to the hotkey inside Cheat Engine.
 
+## Stability options
+
+If BGEE closes when the Cheat Engine table opens automatically, open `BGEE-Hold2Turbo.ahk` and increase the startup delay:
+
+```ahk
+openTableDelayMs := 12000
+```
+
+For example, try `20000` to wait 20 seconds before opening the table.
+
+If BGEE still closes, disable automatic table opening:
+
+```ahk
+autoOpenCheatTable := false
+```
+
+Then open `BGEE-Hold2Turbo.ct` manually after BGEE reaches the main menu or after a save has loaded.
+
 ## Notes
 
 - This is an external automation utility, not a WeiDU mod.
+- The table registers Cheat Engine auto-attach entries but does not directly call `openProcess()` during Lua startup.
 - Cheat Engine may ask for confirmation before running Lua from the table. Choose **Always** if you want the auto-attach setup to run without asking again.
 - If BGEE or Steam is running as administrator, AutoHotkey and Cheat Engine may need matching permissions.
 - Avoid using this in multiplayer or online environments.

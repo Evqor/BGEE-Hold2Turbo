@@ -4,9 +4,11 @@
   <UserdefinedSymbols/>
   <LuaScript><![CDATA[
 -- BGEE-Hold2Turbo
--- This table auto-registers Baldur's Gate: Enhanced Edition process names
--- in Cheat Engine's auto-attach list, then tries immediate attach if the game
--- is already running.
+-- This table registers Baldur's Gate: Enhanced Edition process names
+-- in Cheat Engine's auto-attach list.
+--
+-- It intentionally does not call openProcess() directly. This keeps startup
+-- attachment less aggressive and avoids attaching during BGEE's launch phase.
 --
 -- Configure the Speedhack hotkey once in Cheat Engine:
 --   F9 => Speedhack 2.0x with "Stop on release" enabled
@@ -38,13 +40,6 @@ end
 
 for _, processName in ipairs(processNames) do
   safeAddAutoAttach(processName)
-end
-
--- Try immediate attach in case the game is already running.
-for _, processName in ipairs(processNames) do
-  pcall(function()
-    openProcess(processName)
-  end)
 end
   ]]></LuaScript>
 </CheatTable>
