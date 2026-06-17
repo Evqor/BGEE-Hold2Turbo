@@ -26,8 +26,7 @@ ctPath := A_ScriptDir "\BGEE-Hold2Turbo.ct"
 ; ceExe := "C:\Program Files\Cheat Engine 7.5\cheatengine-x86_64.exe"
 ceExe := ""
 
-; If BGEE closes when the CT is opened automatically, set this to false.
-; You can then open BGEE-Hold2Turbo.ct manually after BGEE reaches the main menu.
+; Controls automatic CT loading. Normally leave this enabled.
 autoOpenCheatTable := true
 
 ; Wait before opening the CT after the BGEE process appears.
@@ -40,6 +39,9 @@ requireGameWindowBeforeOpen := true
 watchIntervalMs := 1000
 showTrayTips := true
 
+; Close the Cheat Engine process launched by this script when BGEE exits.
+closeCheatEngineOnGameExit := true
+
 ; =========================
 ; Internal state
 ; =========================
@@ -47,6 +49,7 @@ showTrayTips := true
 ctLaunchedForCurrentRun := false
 lastGamePid := 0
 gameDetectedTick := 0
+launchedCePid := 0
 resolvedCeExe := ResolveCheatEnginePath(ceExe)
 
 if !FileExist(ctPath) {
@@ -62,7 +65,8 @@ SetTimer WatchBGEE, watchIntervalMs
 WatchBGEE() {
     global gameExeCandidates, ctPath, resolvedCeExe
     global autoOpenCheatTable, openTableDelayMs, requireGameWindowBeforeOpen
-    global ctLaunchedForCurrentRun, lastGamePid, gameDetectedTick, showTrayTips
+    global ctLaunchedForCurrentRun, lastGamePid, gameDetectedTick, launchedCePid, showTrayTips
+    global closeCheatEngineOnGameExit
 
     pid := FindProcess(gameExeCandidates)
 
@@ -74,17 +78,34 @@ WatchBGEE() {
         }
 
         if ShouldOpenCheatTable() {
-            Run '"' resolvedCeExe '" "' ctPath '"', , "Min"
+            Run '"' resolvedCeExe '" "' ctPath '"', , "Min", &newCePid
+            launchedCePid := newCePid
             ctLaunchedForCurrentRun := true
             if showTrayTips {
                 TrayTip "BGEE detected. Cheat Engine table opened after startup delay.", "BGEE-Hold2Turbo", 3
             }
         }
     } else {
+        if lastGamePid != 0 && closeCheatEngineOnGameExit {
+            CloseLaunchedCheatEngine()
+        }
         lastGamePid := 0
         gameDetectedTick := 0
         ctLaunchedForCurrentRun := false
     }
+}
+
+CloseLaunchedCheatEngine() {
+    global launchedCePid, showTrayTips
+
+    if launchedCePid && ProcessExist(launchedCePid) {
+        ProcessClose launchedCePid
+        if showTrayTips {
+            TrayTip "BGEE closed. Cheat Engine process closed.", "BGEE-Hold2Turbo", 3
+        }
+    }
+
+    launchedCePid := 0
 }
 
 ShouldOpenCheatTable() {

@@ -84,6 +84,7 @@ AHK starts
 → BGEE-Hold2Turbo.ct opens through Cheat Engine
 → Cheat Engine attaches to BGEE
 → You use the Speedhack hold key configured in Cheat Engine
+→ When BGEE closes, the Cheat Engine process launched by this script closes too
 ```
 
 ## Start with Windows
@@ -109,13 +110,7 @@ openTableDelayMs := 12000
 
 For example, try `20000` to wait 20 seconds before opening the table.
 
-If BGEE still closes, disable automatic table opening:
-
-```ahk
-autoOpenCheatTable := false
-```
-
-Then open `BGEE-Hold2Turbo.ct` manually after BGEE reaches the main menu or after a save has loaded.
+If it still does not work, please open an issue with your BGEE executable name, Cheat Engine version, and AutoHotkey version.
 
 ## Notes
 
