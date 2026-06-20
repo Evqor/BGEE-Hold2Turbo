@@ -1,5 +1,7 @@
 # BGEE-Hold2Turbo
 
+[한국어 README](README.ko.md)
+
 **BGEE-Hold2Turbo** is a small helper utility for *Baldur's Gate: Enhanced Edition* that detects when Baldur's Gate starts, automatically opens the included Cheat Engine table, and closes the Cheat Engine process launched by the script when the game exits.
 
 It does not patch BGEE game files directly. Instead, it combines **AutoHotkey v2** and **Cheat Engine**:
@@ -38,12 +40,15 @@ If Cheat Engine shows a prompt saying that the table contains Lua code and asks 
 
 ### 2. Keep the files together
 
-Place these two files in the same folder:
+Place these files in the same folder:
 
 ```text
 BGEE-Hold2Turbo.ahk
 BGEE-Hold2Turbo.ct
+settings.ini.example
 ```
+
+`settings.ini` is created automatically on first run. It is not included as a release file so your local settings are not overwritten during updates.
 
 ### 3. Check the Cheat Engine path
 
@@ -56,38 +61,37 @@ C:\Program Files\Cheat Engine 7.4\cheatengine-x86_64.exe
 C:\Program Files\Cheat Engine\cheatengine-x86_64.exe
 ```
 
-If auto-detection fails, open `BGEE-Hold2Turbo.ahk` and set `ceExe` manually.
+If auto-detection fails, open `settings.ini` and set `CheatEngineExe` manually.
 
 Example:
 
-```ahk
-ceExe := "C:\Program Files\Cheat Engine 7.5\cheatengine-x86_64.exe"
+```ini
+[Paths]
+CheatEngineExe=C:\Program Files\Cheat Engine 7.5\cheatengine-x86_64.exe
 ```
 
 ### 4. Optional settings
+
+Configuration is stored in `settings.ini`.
 
 By default, BGEE-Hold2Turbo opens the Cheat Engine table as soon as the BGEE process and game window are detected.
 
 If an error occurs during automatic table loading, try enabling the startup delay:
 
-```ahk
-useOpenTableDelay := true
-openTableDelayMs := 3000
+```ini
+[General]
+UseOpenTableDelay=true
+OpenTableDelayMs=3000
 ```
 
-If you want an easy way to check whether the table was opened, enable the attach notification:
+If you want an easy way to check whether the table is being opened automatically, enable the attach notification:
 
-```ahk
-attachNotify := true
+```ini
+[Notifications]
+AttachNotify=true
 ```
 
-Normal table-open and Cheat Engine-exit notifications are disabled by default:
-
-```ahk
-attachNotify := false
-exitNotify := false
-startupWarningNotify := true
-```
+Normal table-open and Cheat Engine-exit notifications are disabled by default. Startup warnings are enabled by default.
 
 ### 5. Run the script
 
@@ -103,12 +107,38 @@ Expected behavior:
 
 ```text
 AHK starts
+→ settings.ini is created if it does not exist
 → BGEE process is detected
 → BGEE window appears
 → BGEE-Hold2Turbo.ct opens through Cheat Engine
 → Cheat Engine attaches to BGEE
 → You use the Speedhack hold key configured in Cheat Engine
 → When BGEE closes, the Cheat Engine process launched by this script closes too
+```
+
+## Logs
+
+BGEE-Hold2Turbo writes a small runtime log by default:
+
+```text
+logs\BGEE-Hold2Turbo.log
+```
+
+The log records helper startup, BGEE detection, Cheat Engine table opening, Cheat Engine shutdown, and common path errors.
+
+If the log grows past the configured size, the old log is moved to:
+
+```text
+logs\BGEE-Hold2Turbo.log.old
+```
+
+You can change logging behavior in `settings.ini`:
+
+```ini
+[Logging]
+EnableLog=true
+LogPath=logs\BGEE-Hold2Turbo.log
+MaxLogSizeKB=512
 ```
 
 ## Start with Windows
@@ -124,8 +154,14 @@ shell:startup
 
 3. Place a shortcut to `BGEE-Hold2Turbo.ahk` in that folder.
 
+## Updating
+
+Download the latest release archive and overwrite the old helper files.
+
+Your local `settings.ini` and `logs` folder are not included in release archives, so updating should not overwrite your settings or logs.
+
 ## Notes
 
 - If BGEE or Steam is running as administrator, AutoHotkey and Cheat Engine may need matching permissions.
 - Higher Speedhack values may make input timing or scripted events feel less stable.
-- If it does not work even with startup delay enabled, please open an issue with your BGEE executable name, Cheat Engine version, and AutoHotkey version.
+- If it does not work even with startup delay enabled, please open an issue with your BGEE executable name, Cheat Engine version, AutoHotkey version, and the relevant log file.

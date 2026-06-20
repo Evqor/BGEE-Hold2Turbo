@@ -1,0 +1,28 @@
+; BGEE-Hold2Turbo settings example
+; Copy this file to settings.ini only if you want to create the file manually.
+; The helper also creates settings.ini automatically on first run.
+
+[Paths]
+CheatTablePath=BGEE-Hold2Turbo.ct
+CheatEngineExe=
+
+[General]
+GameExeCandidates=Baldur.exe,Baldur64.exe
+AutoOpenCheatTable=true
+UseOpenTableDelay=false
+OpenTableDelayMs=3000
+RequireGameWindowBeforeOpen=true
+WatchIntervalMs=1000
+CloseCheatEngineOnGameExit=true
+
+[Notifications]
+AttachNotify=false
+ExitNotify=false
+StartupWarningNotify=true
+NormalNotifyOptions=Iconi
+WarningNotifyOptions=Icon!
+
+[Logging]
+EnableLog=true
+LogPath=logs\BGEE-Hold2Turbo.log
+MaxLogSizeKB=512
