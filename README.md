@@ -93,6 +93,17 @@ AttachNotify=true
 
 Normal table-open and Cheat Engine-exit notifications are disabled by default. Startup warnings are enabled by default.
 
+Cheat Engine is launched minimized by default. If Cheat Engine still appears as a normal window, the helper also tries to minimize the window again after launch.
+
+If you want the helper to try hiding Cheat Engine completely, enable this option:
+
+```ini
+[General]
+HideCheatEngineWindow=true
+```
+
+This option is disabled by default because it can also hide Cheat Engine prompts or dialogs that may be useful for troubleshooting.
+
 ### 5. Run the script
 
 Run:
@@ -111,6 +122,7 @@ AHK starts
 → BGEE process is detected
 → BGEE window appears
 → BGEE-Hold2Turbo.ct opens through Cheat Engine
+→ Cheat Engine is minimized, or hidden if enabled in settings.ini
 → Cheat Engine attaches to BGEE
 → You use the Speedhack hold key configured in Cheat Engine
 → When BGEE closes, the Cheat Engine process launched by this script closes too

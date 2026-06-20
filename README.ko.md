@@ -93,6 +93,17 @@ AttachNotify=true
 
 기본적으로 일반 테이블 열림 알림과 Cheat Engine 종료 알림은 꺼져 있고, 시작 경고 알림은 켜져 있습니다.
 
+Cheat Engine은 기본적으로 최소화 상태로 실행됩니다. 그래도 일반 창으로 뜨는 경우를 줄이기 위해, 헬퍼가 실행 후 Cheat Engine 창을 한 번 더 최소화합니다.
+
+Cheat Engine 창을 완전히 숨기고 싶다면 아래 옵션을 켜세요.
+
+```ini
+[General]
+HideCheatEngineWindow=true
+```
+
+이 옵션은 Cheat Engine의 확인창이나 안내창까지 숨길 수 있어 문제 해결을 어렵게 만들 수 있으므로 기본값은 꺼져 있습니다.
+
 ### 5. 실행
 
 다음 파일을 실행합니다.
@@ -111,6 +122,7 @@ AHK 실행
 → BGEE 프로세스 감지
 → BGEE 창 감지
 → BGEE-Hold2Turbo.ct가 Cheat Engine으로 열림
+→ Cheat Engine이 최소화됨, 또는 settings.ini에서 켠 경우 숨겨짐
 → Cheat Engine이 BGEE에 부착됨
 → Cheat Engine에서 설정한 Speedhack 홀드 키 사용
 → BGEE 종료 시 이 스크립트가 실행한 Cheat Engine 프로세스도 종료됨

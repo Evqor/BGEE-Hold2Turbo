@@ -30,6 +30,7 @@ defaultOpenTableDelayMs := 3000
 defaultRequireGameWindowBeforeOpen := true
 defaultWatchIntervalMs := 1000
 defaultCloseCheatEngineOnGameExit := true
+defaultHideCheatEngineWindow := false
 defaultAttachNotify := false
 defaultExitNotify := false
 defaultStartupWarningNotify := true
@@ -78,6 +79,10 @@ warningNotifyOptions := ReadTextSetting("Notifications", "WarningNotifyOptions",
 ; Close the Cheat Engine process launched by this script when BGEE exits.
 closeCheatEngineOnGameExit := ReadBoolSetting("General", "CloseCheatEngineOnGameExit", defaultCloseCheatEngineOnGameExit)
 
+; Hide the Cheat Engine window completely instead of minimizing it.
+; This is disabled by default because hidden CE prompts can make troubleshooting harder.
+hideCheatEngineWindow := ReadBoolSetting("General", "HideCheatEngineWindow", defaultHideCheatEngineWindow)
+
 ; Logging.
 enableLog := ReadBoolSetting("Logging", "EnableLog", defaultEnableLog)
 logPath := ResolveScriptPath(ReadTextSetting("Logging", "LogPath", defaultLogPath))
@@ -117,7 +122,7 @@ SetTimer WatchBGEE, watchIntervalMs
 WatchBGEE() {
     global gameExeCandidates, ctPath, resolvedCeExe
     global ctLaunchedForCurrentRun, lastGamePid, gameDetectedTick, launchedCePid
-    global closeCheatEngineOnGameExit, attachNotify, normalNotifyOptions
+    global closeCheatEngineOnGameExit, hideCheatEngineWindow, attachNotify, normalNotifyOptions
 
     pid := FindProcess(gameExeCandidates)
 
@@ -131,10 +136,12 @@ WatchBGEE() {
 
         if ShouldOpenCheatTable() {
             try {
-                Run '"' resolvedCeExe '" "' ctPath '"', , "Min", &newCePid
+                launchMode := hideCheatEngineWindow ? "Hide" : "Min"
+                Run '"' resolvedCeExe '" "' ctPath '"', , launchMode, &newCePid
                 launchedCePid := newCePid
                 ctLaunchedForCurrentRun := true
                 LogMessage("Cheat Engine table opened. CE PID: " launchedCePid)
+                ApplyCheatEngineWindowMode(launchedCePid)
                 if attachNotify {
                     ShowNotify("BGEE detected. Cheat Engine table opened.", normalNotifyOptions)
                 }
@@ -173,6 +180,43 @@ CloseLaunchedCheatEngine() {
     }
 
     launchedCePid := 0
+}
+
+ApplyCheatEngineWindowMode(pid) {
+    global hideCheatEngineWindow
+
+    if !pid {
+        return
+    }
+
+    previousDetectHiddenWindows := A_DetectHiddenWindows
+    DetectHiddenWindows true
+
+    try {
+        if WinWait("ahk_pid " pid, , 5) {
+            hwnds := WinGetList("ahk_pid " pid)
+
+            for hwnd in hwnds {
+                if hideCheatEngineWindow {
+                    WinHide "ahk_id " hwnd
+                } else {
+                    WinMinimize "ahk_id " hwnd
+                }
+            }
+
+            if hideCheatEngineWindow {
+                LogMessage("Cheat Engine window hidden by helper.")
+            } else {
+                LogMessage("Cheat Engine window minimized by helper.")
+            }
+        } else {
+            LogMessage("Cheat Engine window was not found before the window mode timeout.")
+        }
+    } catch as err {
+        LogMessage("Failed to apply Cheat Engine window mode: " err.Message)
+    }
+
+    DetectHiddenWindows previousDetectHiddenWindows
 }
 
 ShouldOpenCheatTable() {
@@ -340,7 +384,8 @@ CreateDefaultSettings(path) {
     content .= "OpenTableDelayMs=3000`n"
     content .= "RequireGameWindowBeforeOpen=true`n"
     content .= "WatchIntervalMs=1000`n"
-    content .= "CloseCheatEngineOnGameExit=true`n`n"
+    content .= "CloseCheatEngineOnGameExit=true`n"
+    content .= "HideCheatEngineWindow=false`n`n"
     content .= "[Notifications]`n"
     content .= "AttachNotify=false`n"
     content .= "ExitNotify=false`n"

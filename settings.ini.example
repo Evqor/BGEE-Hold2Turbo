@@ -14,6 +14,9 @@ OpenTableDelayMs=3000
 RequireGameWindowBeforeOpen=true
 WatchIntervalMs=1000
 CloseCheatEngineOnGameExit=true
+; Set to true to hide Cheat Engine completely instead of minimizing it.
+; Disabled by default because it can hide Cheat Engine prompts and dialogs.
+HideCheatEngineWindow=false
 
 [Notifications]
 AttachNotify=false
